@@ -1,14 +1,12 @@
-% This program segments visual plant disease symptoms
-% Anyela Camargo, June 2014.
+% This program segments visual symptoms of plant diseases
+% Anyela Camargo, August 2016.
 
 function main()
     %change these locations as needed
-    rootname =  'C:\Anyela\matlab\brachydisease\images\';
-    resultf =  'C:\Anyela\matlab\brachydisease\results\';
+    rootname =  pwd();
+    resultf =  pwd();
     outputfileLession = 'lession.csv';
-    outputfileLeaf = 'leaf1.csv';
-    %DiseaseFeatures(rootname, outputfileLession, resultf);
-    LeafFeatures(rootname, outputfileLeaf, resultf);
+    DiseaseFeatures(rootname, outputfileLession, resultf);
 
 
 % Extract leaf features  
@@ -26,7 +24,7 @@ function LeafFeatures(rootname, outputfileLeaf, resultf)
         char3 =  strread(name0,'%s','delimiter','.');
         fname = strcat(rootname, name0)
         I = imread(fname);
-        %Select background
+        %Select 
         BWB = processImage(I, 1, 240, 255); 
         [BWB, IC, leaf] = selectBackground(I, BWB);
         [tr, tg, tb] = selectLeaftip(leaf, I);
@@ -43,46 +41,26 @@ function LeafFeatures(rootname, outputfileLeaf, resultf)
  
  % Extract disease features
  function DiseaseFeatures(rootname, outputfileLession, resultf)
-    rd = dir(strcat(rootname, 'BD*.jpg'));
-    fileID = fopen(char(strcat(resultf,outputfileLession)),'w');
-    fprintf(fileID,'%s, %s, %s, %s, %s, %s, %s, %s, %s\n', 'fname', 'symptom', ...
-        'area', 'eccentricity', 'orientation', 'meanr', 'meang', 'meanb', 'dist2base');
-    x = {'BD_01396_1.jpg','BD_01396_2.jpg','BD_01396_3.jpg','BD_01396_4.jpg'};
+    rd = dir(strcat(rootname, '\', 'Dre*.jpg'));
+    fileID = fopen(char(strcat(resultf,'\', outputfileLession)),'w');
+    fprintf(fileID,'%s, %s, %s, %s, %s \n', 'fname', 'symptom', ...
+        'area', 'eccentricity', 'orientation');
     
     for i=1:length(rd)
         name0 = rd(i).name;
         char3 =  strread(name0,'%s','delimiter','.');
-        fname = strcat(rootname, name0)
+        fname = strcat(rootname, '\', name0)
         I = imread(fname);
-        %Select background
-        BWB = processImage(I, 1, 240, 255); 
-        [BWB, IC, leaf] = selectBackground(I, BWB);
-        %createTraing(I);
-        BL = selectLeaf(IC, char3(1));
-        [a,b] = StartLeaf(leaf);
-        %imshow(BL);
-        lid = find(ismember(x,name0));
-        BWChlorosis = processChlorosis(IC, lid);
-        BWNecrosis = processNecrosis(IC, BWChlorosis, BWB, lid);
-        %BWNecrosis(find(BL)) = 0;
-        %figure
-        %subplot(3,1,1), imshow(I); subplot(3,1,2), imshow(BWChlorosis); 
-        %subplot(3,1,3), imshow(BWNecrosis);
-        [mchl, BM] = mergeImage(I, BWB, BWChlorosis);
-        [chl] = extractFeatures(I, BM, a,b);
-        [mnec, BM] = mergeImage(I, BWB, BWNecrosis);
-        
-        [ne] = extractFeatures(I, BM,a,b);
-        %figure
-        %subplot(3,1,1), imshow(I); subplot(3,1,2), imshow(mchl); 
-        %subplot(3,1,3), imshow(mnec)
-        
-        plotTrans(I, mchl, mnec, char3(1), resultf);
-        % plot image
-        if (size(lid,2) > 0)
-            savedata(fileID, chl, char3(1), 'Chlorosis' );
-        end
-        savedata(fileID, ne, char3(1), 'Necrosis');
+        %Select ROI
+        CI = cropImage(I);
+        %Segment image
+        BWB = processImage(CI, 1, 143, 225); 
+        % Plot results
+        saveimage(I, BWB);
+        % extract features
+        [ne] = extractFeatures(BWB);
+        % save features in file
+        savedata(fileID, ne, char3(1));
         close all;
      
     end
@@ -199,18 +177,16 @@ function[a,b] = StartLeaf(BW, h)
       
 
 % Show original and segmented images in a plot
-function saveimage(I,BWM, BWB,BWL,BWF, name)
+function saveimage(I,BWM)
+    name='a'
     m = I;
     m(find(BWM)) = 255;
     f=figure('Visible','on');
     labTransformation = makecform('srgb2lab');
     ISEG = applycform(I, labTransformation);
-    subplot(3,2,1),imshow(I), title(strcat('Original image',name));
-    subplot(3,2,2),imhist(ISEG(:,:,1)), title('Hist');
-    subplot(3,2,3),imshow(BWB), title('Segment background');
-    subplot(3,2,4),imshow(BWL), title('Segment leaf');
-    subplot(3,2,5),imshow(BWF), title('Segment diseased area');;
-    subplot(3,2,6),imshow(m), title('Final image');
+    subplot(3,1,1),imshow(I), title(strcat('Original image',name));
+    subplot(3,1,2),imshow(BWM), title('Segment diseased area');;
+    subplot(3,1,3),imshow(m), title('Final image');
     saveas(f, char(strcat(name, '_plot', '.png')));
 
     
@@ -220,10 +196,13 @@ function saveimage(I,BWM, BWB,BWL,BWF, name)
 % mn = min pixel value
 % mx = max pixel value
 function[BW] = processImage(I, channel, mn, mx)
-    labTransformation = makecform('srgb2lab');
-    ISEG = applycform(I, labTransformation);
-    [counts,x] = imhist(ISEG(:,:,1));
-    BW = roicolor(ISEG(:,:,channel), mn, mx);
+%     labTransformation = makecform('srgb2lab');
+%     ISEG = applycform(I, labTransformation);
+%     [counts,x] = imhist(ISEG(:,:,1));
+    R = I(:,:,1);
+    G = I(:,:,2);
+    B = I(:,:,3);
+    BW = roicolor(R, mn, mx);
     BW = bwareaopen(BW, 60);
     
         
@@ -306,22 +285,9 @@ function[m, BWF] = mergeImage(I, BWB, BWN)
     %imshow(m);
     
 % Extract features from segmented areas      
-function[fv] = extractFeatures(I, BWF, a,b)
+function[fv] = extractFeatures(BWF)
     
     fv = regionprops(BWF, 'Area', 'Eccentricity', 'Orientation', 'PixelIdxList');
-    for i=1:length(fv)
-       
-       u = I(:,:,1);
-       fv(i).meanr = mean(u(fv(i).PixelIdxList));
-       u = I(:,:,2);
-       fv(i).meang = mean(u(fv(i).PixelIdxList));
-       u = I(:,:,3);
-       fv(i).meanb = mean(u(fv(i).PixelIdxList));
-       U = zeros(size(u));
-       U(fv(i).PixelIdxList) = 1;
-       [a1, b1] = StartLeaf(U);
-       fv(i).dist2base = sqrt((a-a1)^2+(b-b1)^2);
-    end
         
         
     
@@ -335,14 +301,11 @@ function[a] = filterDataAll(BWH)
 % outputfile = File where data are saved
 % feature_array = Array with segmented regions
 % fname = Image name
-function savedata(outputfile, feature_array, fname, lessionname)
-   
+function savedata(outputfile, feature_array, fname)
+   fname
    for i=1:length(feature_array)
-        fprintf(outputfile, '%s, %s, %12.0f, %12.0f, %12.0f, %12.0f,%12.0f,%12.0f, %12.0f \n', fname{1}, ...
-            lessionname,...
-        feature_array(i).Area, feature_array(i).Eccentricity, feature_array(i).Orientation, ... 
-        feature_array(i).meanr, feature_array(i).meang, feature_array(i).meanb,...
-        feature_array(i).dist2base);
+        fprintf(outputfile, '%s, %12.0f, %12.0f, %12.0f \n', fname{1},...
+        feature_array(i).Area, feature_array(i).Eccentricity, feature_array(i).Orientation)
     end
 
        
@@ -396,5 +359,11 @@ function[] = searchChlorosis(BW, I)
     BW2 = false(size(BW));
     BW2(y(idx).PixelIdxList) = true;
     
-    
+
+function[maskedRgbImage] = cropImage(I)
+        imshow(I);
+        BW = roipoly;
+        maskedRgbImage = bsxfun(@times, I, cast(BW,class(I)));
+        % Display it.
+        imshow(maskedRgbImage);
     
