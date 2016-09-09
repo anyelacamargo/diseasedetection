@@ -77,6 +77,56 @@ Early detection is essential for the control of emerging, re-emerging, and novel
 
 \subsection{Ontology}
 \todo{Ammar could add all the information about the onotlogy here}
+The Plant Protection Ontology (PPOntology) was developed in 2008 [by Ammar Halabi?] during an eight-month stay at the International Center for Agricultural Research in the Dry Areas (ICARDA), near Aleppo, Syria. This project aimed to model the knowledge of agricultural experts in diagnosing barley diseases as an initial stage to building a system for automatic detection of barley disorders. As a result, PPOntology establishes a vocabulary to describe symptoms, environmental conditions and agricultural practices, which are the main factors taken into account when experts carry out their diagnosis.
+
+The ontology was developed by reviewing various relevant systems, agricultural manuals, and through interviewing agricultural experts in ICARDA. The researcher reviewed existing attempts to implement systems for detecting plant disorders, including the Regional Wheat Expert System, the tomato expert system developed by Al-Shamaa [ref], and the Knowledge Acquisition Tool (KAT) developed at ICARDA and
+CLAES [ref]. This helped establish an initial understanding of the vocabulary and categories used to describe and model factors related to plant disorders, and to conceptualize the problem domain as consisting of three main concept categories: disorders, symptom groups, and control plans.
+
+After reviewing the Utilization of Intelligent Systems for Plant Protection project (UISPP) developed by several organizations [UISPP], in addition to the Barley Disease Handbook [Neate & McMullen], PPOntology was refined to account for various types of disorders (e.g. biotic, including micropests like fungi or viruses; or abiotic, including mineral deficiencies or environmental stresses). Another main concept category was added as well to account for environmental conditions. The researcher validated the resulting knowledge model with two experts in entomology and plant pathology in ICARDA. This brought up the importance for accounting for the growth sage of the plant, which strongly influences the development of symptoms of a certain pathogen. Subsequently, the ontology was updated to split cases (a renaming of the previous category of "sympom groups") into various growth stages. With this scheme, the same disorder (or pathogen) can be linked to various cases belonging to different growth stages. Another concept category named "observations" was added to group all possible observable symptoms, and this was split to various categories to correspond to observations on different plant parts.
+
+The final refinement included further nuances in concept categories to account for plant attributes (e.g. leaf color), growth stages, and to link them with observations. This was done through building a partial knowledge base with the ontology. The researcher filled-in most barley disorders common in Syria, including fungal, bacterial, viral, and insect disorders along with phytotoxicities and mineral deficiencies [Appendix A]. He also entered information about biological organisms and materials causing disorders for barley plants. This was accumulated based on [Mamluk et al 1992] [UISPP 2006], as well as [Yahyaoui et al 2003] [Neate & McMullen] for verification and validation.
+
+[optional appendix]
+Here we summarize the structure of basic concepts in PPOntology. In the following list, a concept that is nested under another concept represent a subclass of that higher class concept.
+
+\begin{itemize}
+\item Organism: represents the base class of all classes and instances of biological organisms that
+are related to barley disorders.
+	\begin{itemize}
+	\item Animal: represents the base class for all classes and instances of animals (e.g. Rat).
+	\item Microorganism: represents the base class for all classes and instances of microorganisms (e.g. Cochliobolus Sativus).
+	\end{itemize}
+\item Material: represents the base class of all classes and instances of materials that are related to
+barley disorders.
+	\begin{itemize}
+	\item Mineral: represents the class of nutrient minerals of the barley plant (e.g. Nitrogen).
+	\item Pesticide: represents the class of pesticides used for the control of barley disorders (e.g. Dicamba).
+	\end{itemize}
+\item Disorder: represents the base class of all classes and instances of barley disorders (e.g.
+barley stripe). Every Disorder instance is linked to a set of Organism or Material instances
+that are considered the agents of the corresponding disorder. Also, each Disorder instance is
+also linked to a set of Case instances that represents a group of possible manifestations.
+	\begin{itemize}
+	\item Abiotic Disorder: represents the base class for all classes and instances of barley disorders caused due to non-biotic reasons (e.g. Boron Phytotoxicity).
+	\item Biotic Disorder: represents the base class for all classes and instances of barley disorders caused by biotic pathogens (e.g. Powdery Mildew).
+	\end{itemize}
+\item Plant Attribute: represents the base class of all classes and instances of possible attributes of
+plant parts (e.g. Leaf Color).
+\item Growth Stage: represents the class of different growth stages of the barley plant (e.g.
+Heading).
+\item Observation: represents the observations of different plant parts, where an Observation
+instance links between a set of Plant Attribute instances and a set of Growth Stage instances
+to mark the stage of growth at which these attributes were observed.
+\item Environmental Conditions: represents the base class of environmental conditions
+surrounding barley plants.
+\item Control Plan: represents groups of control measures and directions associated for the
+treatment of specific cases of disorders.
+\item Case: represents the class of barley disorder cases, which are associated to their causing
+disorders. Each Case instance is associated with a set of Observation instances that
+represents a group of consistent observations which can be made in the course of
+corresponding disorder, a set of Environmental Condition instances, and a Control Plan
+instance.
+\end{itemize}
 
 \todo{Perla and I will add the information about the algorithm}
 
