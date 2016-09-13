@@ -1,4 +1,4 @@
-\begin{thebibliography}{0}
+\begin{thebibliography}{4}
 \providecommand{\natexlab}[1]{#1}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
@@ -11,5 +11,31 @@
 \providecommand{\bibAnnote}[2]{%
   \begin{quotation}\noindent\textsc{Key:} #1\\
   \textsc{Annotation:}\ #2\end{quotation}}
+
+\bibitem[{Berkey(1992)}]{berkey1992storytelling}
+Berkey, J.~P. (1992).
+\newblock Storytelling, preaching, and power in mamluk cairo.
+\newblock \emph{Mamluk Studies Review} 4, 53--73
+\bibAnnoteFile{berkey1992storytelling}
+
+\bibitem[{Boose(1990)}]{boose1990knowledge}
+Boose, J.~H. (1990).
+\newblock Knowledge acquisition tools, methods and mediating representations.
+\newblock \emph{Knowledge Acquisition for Knowledge-Based Systems (Motoda, H.
+  et al., Eds), IOS Press, Ohinsha Ltd., Tokyo} , 123--168
+\bibAnnoteFile{boose1990knowledge}
+
+\bibitem[{El-Sebae~Ahmed et~al.(2002)El-Sebae~Ahmed, Rafae, and
+  Shaalan}]{el2002expert}
+El-Sebae~Ahmed, S., Rafae, A., and Shaalan, K. (2002).
+\newblock Expert systems: Useful tools for enhancing agricultural research and
+  production.
+\newblock \emph{ICARDA Caravan (ICARDA)}
+\bibAnnoteFile{el2002expert}
+
+\bibitem[{Neate and McMullen(2010)}]{neate2010barley}
+Neate, S. and McMullen, M. (2010).
+\newblock Barley disease handbook
+\bibAnnoteFile{neate2010barley}
 
 \end{thebibliography}
