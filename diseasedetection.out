@@ -1,7 +1,9 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
 \BOOKMARK [1][-]{section.2}{Material \046 Methods}{}% 2
 \BOOKMARK [2][-]{subsection.2.1}{Images}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Ontology}{section.2}% 4
-\BOOKMARK [3][-]{subsubsection.2.2.1}{Ontology structure}{subsection.2.2}% 5
-\BOOKMARK [1][-]{section.3}{Results}{}% 6
-\BOOKMARK [1][-]{section.4}{Discussion}{}% 7
+\BOOKMARK [2][-]{subsection.2.2}{Image processing}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Ontology}{section.2}% 5
+\BOOKMARK [3][-]{subsubsection.2.3.1}{Ontology structure}{subsection.2.3}% 6
+\BOOKMARK [2][-]{subsection.2.4}{Automatic annotation}{section.2}% 7
+\BOOKMARK [1][-]{section.3}{Results}{}% 8
+\BOOKMARK [1][-]{section.4}{Discussion}{}% 9

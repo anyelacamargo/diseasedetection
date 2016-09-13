@@ -77,6 +77,8 @@ Early detection is essential for the control of emerging, re-emerging, and novel
 
 \subsection{Images}
 
+\subsection{Image processing}
+Digital images were processed using Matlab \cite{MATLAB:2016} in the following sequence: 1) Nearest neighbour foreground/background colour separation was used to classify pixels. Two sets of colour intensities, corresponding to foreground (target) and to background (non target) are selected. RGB pixels matching selected intensities are mapped into the image. A search around mapped pixels is performed to identify pixels with similar intensities that might be part of the foreground/background regions. Once the search is performed, the image is converted to binary, where 1 is the target (disease symptom) and 0 the background (e.g. leaf, soil and stones). 2) Morphological techniques were then applied to deal with pixels incorrectly classified. First, morphological erosion was applied to remove small and isolated pixel regions incorrectly classified as plant. Second, morphological dilation was applied to correct for those pixels located in the border of the images that were incorrectly classified as background. Once the images were segmented, \todo{n?} image features (Table \todo{n} shows the list of features - descriptors) describing the geometry, shape and size of the lesions were extracted. Some of these features are illustrated in Figure \todo{?} (an example set is shown in Figure S1). 
 
 \subsection{Ontology}
 %\todo{Ammar could add all the information about the onotlogy here}
@@ -131,7 +133,7 @@ corresponding disorder, a set of Environmental Condition instances, and a Contro
 instance.
 \end{itemize}
 
-\todo{Perla and I will add the information about the algorithm}
+\subsection{Automatic annotation}
 
 \section{Results}
 
