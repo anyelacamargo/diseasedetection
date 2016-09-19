@@ -51,7 +51,28 @@ function LeafFeatures(rootname, outputfileLeaf, resultf)
         char3 =  strread(name0,'%s','delimiter','.');
         fname = strcat(rootname, '\', name0)
         I = imread(fname);
-        %Select ROI
+        
+        %% if relevant get illuminant corrected image
+        imshow(I)
+        imCorrection = input('Get illuminant corrected image? (y or n): ', 's');
+        if strcmp(imCorrection, 'y')
+            [imGW, imMaxRGB, imMink4] = illuminant_correction(I);
+            subplot(2,3,2), imshow(I), title('Original Image')
+            subplot(2,3,4), imshow(imGW), title('Grey World')
+            subplot(2,3,5), imshow(imMaxRGB), title('MaxRGB')
+            subplot(2,3,6), imshow(imMink4), title('Minkowski Norm')
+            useImage = input('Select image 1, 2 or 3 (or 0 for orignal');
+            switch useImage   
+                case 1
+                    I = imGW;
+                case 2
+                    I = imMaxRGB;
+                case 3
+                    I = imMink4;
+            end
+        end
+        
+        %% Select ROI
         CI = cropImage(I);
         %Segment image
         BWB = processImage(CI, 1, 143, 225); 
