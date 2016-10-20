@@ -3,45 +3,16 @@
 
 function main()
     %change these locations as needed
-    rootname =  pwd();
+    rootname =  'diseasedetection';
     resultf =  pwd();
+    imagefolder = 'images';
     outputfileLession = 'lession.csv';
-    DiseaseFeatures(rootname, outputfileLession, resultf);
+    DiseaseFeatures(rootname, imagefolder, outputfileLession, resultf);
 
 
-% Extract leaf features  
-function LeafFeatures(rootname, outputfileLeaf, resultf) 
-    
-    % ROI by pot in six pots tray. Two rows and three columns.
-    % Middle pot first row is empty
-
-    rd = dir(strcat(rootname, 'BD_01300_3*.jpg'));
-    fileIDLeaf = fopen(char(strcat(resultf, outputfileLeaf)),'w');
-    
-    for i=1:length(rd)
-        
-        name0 = rd(i).name;
-        char3 =  strread(name0,'%s','delimiter','.');
-        fname = strcat(rootname, name0)
-        I = imread(fname);
-        %Select 
-        BWB = processImage(I, 1, 240, 255); 
-        [BWB, IC, leaf] = selectBackground(I, BWB);
-        [tr, tg, tb] = selectLeaftip(leaf, I);
-        featureStruct = extractLeafFeafures(leaf, I, char3(1), tr, tg, tb);
-        if(i == 1)
-            createFileHead(fileIDLeaf, featureStruct);
-        end
-        saveFeatureData(fileIDLeaf, featureStruct)
-     close all;
-    end
-    fclose(fileIDLeaf);
-   
- 
- 
  % Extract disease features
- function DiseaseFeatures(rootname, outputfileLession, resultf)
-    rd = dir(strcat(rootname, '\', 'Dre*.jpg'));
+ function DiseaseFeatures(rootname, imagefolder, outputfileLession, resultf)
+    rd = dir(strcat('..\', imagefolder, '\','*.jpg'));
     fileID = fopen(char(strcat(resultf,'\', outputfileLession)),'w');
     fprintf(fileID,'%s, %s, %s, %s, %s \n', 'fname', 'symptom', ...
         'area', 'eccentricity', 'orientation');
@@ -49,7 +20,7 @@ function LeafFeatures(rootname, outputfileLeaf, resultf)
     for i=1:length(rd)
         name0 = rd(i).name;
         char3 =  strread(name0,'%s','delimiter','.');
-        fname = strcat(rootname, '\', name0)
+        fname = strcat('..\', imagefolder, '\', name0)
         I = imread(fname);
         
         %% if relevant get illuminant corrected image
@@ -57,25 +28,14 @@ function LeafFeatures(rootname, outputfileLeaf, resultf)
         imCorrection = input('Get illuminant corrected image? (y or n): ', 's');
         if strcmp(imCorrection, 'y')
             [imGW, imMaxRGB, imMink4] = illuminant_correction(I);
-            subplot(2,3,2), imshow(I), title('Original Image')
-            subplot(2,3,4), imshow(imGW), title('Grey World')
-            subplot(2,3,5), imshow(imMaxRGB), title('MaxRGB')
-            subplot(2,3,6), imshow(imMink4), title('Minkowski Norm')
-            useImage = input('Select image 1, 2 or 3 (or 0 for orignal');
-            switch useImage   
-                case 1
-                    I = imGW;
-                case 2
-                    I = imMaxRGB;
-                case 3
-                    I = imMink4;
-            end
         end
         
+        close all
         %% Select ROI
         CI = cropImage(I);
         %Segment image
-        BWB = processImage(CI, 1, 143, 225); 
+        BW = classifyImage(CI);
+        
         % Plot results
         saveimage(I, BWB);
         % extract features
@@ -88,24 +48,49 @@ function LeafFeatures(rootname, outputfileLeaf, resultf)
     fclose(fileID)
   
     
-    
-function createTraining(I)
-    imshow(I);
-    BIC = imcrop;
-    
+%Classify image by k-means - unsupervised  
+% CI = Cropped image
+% Return BW, disease symptoms
+function[BW] = classifyImage(CI)
+    cform = makecform('srgb2lab');
+    lab_he = applycform(CI,cform);
+    ab = double(lab_he(:,:,2:3));
+    nrows = size(ab,1);
+    ncols = size(ab,2);
+    ab = reshape(ab,nrows*ncols,2);
 
-function[BL] = selectLeaf(I, name)
-    r = I(:, :, 1);             % red channel
-    g = I(:, :, 2);             % green channel
-    b = I(:, :, 3);             % blue channel
-    greeness = double(g) - max(double(r), double(b));
-    %f=figure
-    %subplot(2,1,1), imshow(I);
-    %subplot(2,1,2), imhist(g);
-    h = imhist(g);
-    max(h(2:240))
-    %saveas(f, char(strcat(name, '_plot', '.png')));
-    BL = roicolor(greeness, 54, 116);
+    nColors = 3;
+    % repeat the clustering 3 times to avoid local minima
+    [cluster_idx, cluster_center] = kmeans(ab,nColors,'distance','sqEuclidean', ...
+                                      'Replicates',3);
+                                  pixel_labels = reshape(cluster_idx,nrows,ncols);
+    imshow(pixel_labels,[]), title('image labeled by cluster index')
+    segmented_images = cell(1,3);
+    rgb_label = repmat(pixel_labels,[1 1 3]);
+
+    for k = 1:nColors
+        color = CI;
+        color(rgb_label ~= k) = 0;
+        segmented_images{k} = color;
+    end
+    
+    ui = plotClasses(CI, segmented_images);
+    X = zeros(size(pixel_labels));
+    BW = pixel_labels == ui;
+    [fv] = extractFeatures(BW);
+   
+    
+    
+%Plot cluster classification
+% I = Cropped image
+% segmented_images = Clusters
+% Return an index indicating which cluster represents a disease
+ function[useImage] = plotClasses(I, segmented_images)
+    subplot(2,3,2), imshow(I), title('Original Image')
+    subplot(2,3,4), imshow(segmented_images{1}), title('objects in cluster 1');
+    subplot(2,3,5), imshow(segmented_images{2}), title('objects in cluster 2');
+    subplot(2,3,6), imshow(segmented_images{3}), title('objects in cluster 3');
+    useImage = input('Select b 1, 2 or 3 (or 0 for orignal');
     
     
 function[features] = extractLeafFeafures(leaf, I, fname, tipr, tipg, tipb)
@@ -339,25 +324,6 @@ function plotTrans(I, mchl, mnec, name, result)
     title(strcat('Original image' ,name));
     saveas(f, char(strcat(result, name, '_plot', '.png')));
  
-    
-function[tr,tg, tb] = selectLeaftip(leaf, I) 
-    leaf = bwareaopen(leaf, 10000);
-    [B,L] = bwboundaries(leaf,'noholes');
-    i = find(B{1}(:,2) == max(B{1}(:,2)));
-    i = max(i);
-    x = 30;
-    I2 = imcrop(I,[(B{1}(i,2)-x) (B{1}(i,1)-10) x+12 20]);
-    labTransformation = makecform('srgb2lab');
-    ISEG = applycform(I2, labTransformation);
-    %imagesc(ISEG(:,:,2));
-    r = I2(:, :, 1);             % red channel
-    g = I2(:, :, 2);             % green channel
-    b = I2(:, :, 3);  
-    tr = mean(r(find(r ~= 255)));
-    tg = mean(g(find(g ~= 255)));
-    tb = mean(b(find(b ~= 255)));
-    
- 
 function[BW] = deleteFP(BW)
     %imagesc(bwlabel(BW));
     CC = regionprops(BW, 'Area', 'Eccentricity', 'PixelIdxList', 'Extent', 'Solidity');
@@ -387,4 +353,4 @@ function[maskedRgbImage] = cropImage(I)
         maskedRgbImage = bsxfun(@times, I, cast(BW,class(I)));
         % Display it.
         imshow(maskedRgbImage);
-    
+

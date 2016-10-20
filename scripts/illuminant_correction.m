@@ -41,3 +41,22 @@ c=1; imMink4(:,:,c) = imMink4(:,:,c) ./ LMink4(c);
 c=2; imMink4(:,:,c) = imMink4(:,:,c) ./ LMink4(c);
 c=3; imMink4(:,:,c) = imMink4(:,:,c) ./ LMink4(c);
 %imshow(uint8(imMink4.*255))
+
+plotIlluminant(im, imGW,imMaxRGB, imMink4);
+
+
+function[I] = plotIlluminant(I, imGW,imMaxRGB, imMink4)
+ 
+    subplot(2,3,2), imshow(I), title('Original Image')
+    subplot(2,3,4), imshow(imGW), title('Grey World')
+    subplot(2,3,5), imshow(imMaxRGB), title('MaxRGB')
+    subplot(2,3,6), imshow(imMink4), title('Minkowski Norm')
+    useImage = input('Select image 1, 2 or 3 (or 0 for orignal');
+    switch useImage   
+        case 1
+            I = imGW;
+        case 2
+            I = imMaxRGB;
+        case 3
+            I = imMink4;
+    end
