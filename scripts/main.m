@@ -1,33 +1,36 @@
 % This program segments visual symptoms of plant diseases
 % Anyela Camargo, August 2016.
 
-function main()
+function main(imagefolder)
     %change these locations as needed
     rootname =  'diseasedetection';
     resultf =  pwd();
-    imagefolder = 'images';
+    %imagefolder = 'images';
     outputfileLession = 'lession.csv';
     DiseaseFeatures(rootname, imagefolder, outputfileLession, resultf);
 
 
  % Extract disease features
  function DiseaseFeatures(rootname, imagefolder, outputfileLession, resultf)
-    rd = dir(strcat('..\', imagefolder, '\','*.jpg'));
-    fileID = fopen(char(strcat(resultf,'\', outputfileLession)),'w');
+    %rd = dir(strcat('..\', imagefolder, '\','*.jpg'));    
+    rd = dir(fullfile(imagefolder, '*.jpg'));
+    %fileID = fopen(char(strcat(resultf,'\', outputfileLession)),'w');
+    fileID = fopen(char(fullfile(resultf, outputfileLession)),'w');
     fprintf(fileID,'%s, %s, %s, %s, %s \n', 'fname', 'symptom', ...
         'area', 'eccentricity', 'orientation');
     
     for i=1:length(rd)
         name0 = rd(i).name;
         char3 =  strread(name0,'%s','delimiter','.');
-        fname = strcat('..\', imagefolder, '\', name0)
+        %fname = strcat('..\', imagefolder, '\', name0)
+        fname = fullfile(imagefolder, name0)
         I = imread(fname);
         
         %% if relevant get illuminant corrected image
         imshow(I)
         imCorrection = input('Get illuminant corrected image? (y or n): ', 's');
         if strcmp(imCorrection, 'y')
-            [imGW, imMaxRGB, imMink4] = illuminant_correction(I);
+            I = illuminant_correction(I);
         end
         
         close all
