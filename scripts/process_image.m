@@ -49,13 +49,13 @@ function main(imagefolder)
     end
     fclose(fileID)
   
-function[B] = createBoundary(BW, I)
+function[B] = createBoundary(BW, I, fname)
     B = bwboundaries(BW);
     f=figure('Visible','on');
     imshow(I)
     hold on
     visboundaries(B)
-    saveas(f, char(strcat(name, '_plot', '.png')));
+    saveas(f, char(strcat(fname, '_plot', '.png')));
 
 %Classify image by k-means - unsupervised  
 % CI = Cropped image
@@ -302,7 +302,7 @@ function[m, BWF] = mergeImage(I, BWB, BWN)
 % Extract features from segmented areas      
 function[fv] = extractFeatures(BWF)
     
-    fv = regionprops(BWF, 'Area', 'Eccentricity', 'Orientation', 'PixelIdxList');
+   fv = regionprops(BWF, 'Area', 'Eccentricity', 'Orientation', 'PixelIdxList');
         
         
     
