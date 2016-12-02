@@ -40,7 +40,7 @@ function main(imagefolder)
         BW = classifyImage(CI);
         
         % Plot results
-        saveimage(I, BWB);
+        saveimage(I, BW);
         % extract features
         [ne] = extractFeatures(BWB);
         % save features in file
