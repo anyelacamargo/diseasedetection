@@ -38,11 +38,10 @@ function main(imagefolder)
         CI = cropImage(I);
         %Segment image
         BW = classifyImage(CI);
-        
-        % Plot results
-        saveimage(I, BW);
-        % extract features
-        [ne] = extractFeatures(BWB);
+         % extract features
+        [ne] = extractFeatures(BW);
+        createBoundary(BW, I, char3(1));
+        %vextr = findCorners(ICrop); 
         % save features in file
         savedata(fileID, ne, char3(1));
         close all;
@@ -50,7 +49,14 @@ function main(imagefolder)
     end
     fclose(fileID)
   
-    
+function[B] = createBoundary(BW, I)
+    B = bwboundaries(BW);
+    f=figure('Visible','on');
+    imshow(I)
+    hold on
+    visboundaries(B)
+    saveas(f, char(strcat(name, '_plot', '.png')));
+
 %Classify image by k-means - unsupervised  
 % CI = Cropped image
 % Return BW, disease symptoms
@@ -93,7 +99,7 @@ function[BW] = classifyImage(CI)
     subplot(2,3,4), imshow(segmented_images{1}), title('objects in cluster 1');
     subplot(2,3,5), imshow(segmented_images{2}), title('objects in cluster 2');
     subplot(2,3,6), imshow(segmented_images{3}), title('objects in cluster 3');
-    useImage = input('Select b 1, 2 or 3 (or 0 for orignal');
+    useImage = input('Select b 1, 2 or 3 (or 0 for orignal: )');
     
     
 function[features] = extractLeafFeafures(leaf, I, fname, tipr, tipg, tipb)
